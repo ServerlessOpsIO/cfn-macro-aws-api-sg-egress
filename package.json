@@ -1,0 +1,13 @@
+{
+  "name": "cfn-macro-aws-api-sg-egress",
+  "description": "",
+  "version": "0.0.1",
+  "dependencies": {},
+  "devDependencies": {
+    "serverless-pseudo-parameters": "^2.2.0",
+    "serverless-python-requirements": "4.1.1"
+  },
+  "scripts": {
+    "setup": "pyenv virtualenv 3.6 $(basename $(pwd)) && pyenv local $(basename $(pwd)) && pip install -r requirements.txt -r requirements-dev.txt"
+  }
+}

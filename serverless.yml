@@ -1,0 +1,49 @@
+# <DESCRIBE SERVICE>
+service: cfn-macro-aws-api-sg-egress
+
+plugins:
+  - serverless-python-requirements
+  - serverless-pseudo-parameters
+
+
+custom:
+  stage: "${opt:stage, env:SLS_STAGE, 'dev'}"
+  profile: "${opt:aws-profile, env:AWS_PROFILE, env:AWS_DEFAULT_PROFILE, 'default'}"
+  log_level: "${env:LOG_LEVEL, 'INFO'}"
+
+  pythonRequirements:
+    dockerizePip: false
+
+
+provider:
+  name: aws
+  runtime: python3.6
+  stage: ${self:custom.stage}
+  profile: ${self:custom.profile}
+  region: "${opt:region, 'us-east-2'}"
+  environment:
+    LOG_LEVEL: ${self:custom.log_level}
+  stackTags:
+    x-service: cfn-macro-aws-api-sg-egress
+    x-stack: ${self:service}-${self:provider.stage}
+
+
+functions:
+  GenerateSqEgress:
+    handler: handlers/generate_sg.handler
+    description: "Create SG egress rule for AWS API"
+    memorySize: 128
+    timeout: 30
+
+resources:
+  Resources:
+    Macro:
+      Type: AWS::CloudFormation::Macro
+      Properties:
+        Name: '#{AWS::StackName}'
+        Description: "Create SG egress rule for AWS API"
+        FunctionName:
+          Fn::GetAtt:
+            - GenerateSqEgressLambdaFunction
+            - Arn
+
